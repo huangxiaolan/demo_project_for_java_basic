@@ -10,4 +10,16 @@
 
 包括excel读写，文件读写，正则表达式使用。
 
+# git命令配置。
+
+修改$USER_HOME/.gitconfig, 增加用户名，增加保存密码的配置。
+```
+[user]
+    name = hxiaol
+    email = user@hxiaol.com
+[credential]
+    helper = store
+```
+
+
 
