@@ -1,0 +1,102 @@
+syntax = "proto3";
+
+package pb;
+
+option cc_generic_services = true;
+option java_generic_services = true;
+option py_generic_services = true;
+
+option java_package = "com.yy.wolfkill.h5game.guojitiaoqi.pb";
+option java_multiple_files = true;
+
+// readyGoRes协议
+message ReadyGoRes {
+    int32 code = 1;
+    string msg = 2;
+    ReadyGoResData data = 3;
+}
+message ReadyGoResData {
+}
+
+// GameOverRes协议
+message GameOverRes {
+    int32 code = 1;
+    string msg = 2;
+    GameOverResData data = 3;
+}
+message GameOverResData {
+    string reason = 1;
+    string winUid = 2;
+    string winTeamid = 3;
+    GameResult result = 4;
+}
+
+message GameResult {
+    int32 timestamp = 1;
+    string nonstr = 2;
+    string sign = 3;
+    string gametype = 4;
+    GameResultDetail result = 5;
+}
+
+message GameResultDetail {
+    string gameid = 1;
+    string roomid = 2;
+    string channelid = 3;
+    string resulttype = 4;
+    repeated string users = 5;
+    repeated string winners = 6;
+    
+    repeated string jifen = 7;
+    
+    repeated int64 gametime = 8;
+    
+    repeated string winteam = 9;
+    repeated TeamsDetail teams = 10;
+}
+
+message TeamsDetail {
+    string teamid = 1;
+    repeated string uids = 2;
+}
+
+// 断线重连协议
+message ReLoginRes {
+    int32 code = 1;
+    string msg = 2;
+    ReLoginResData data = 3;
+}
+message ReLoginResData {
+    string stage = 1;    // 游戏当前阶段
+}
+
+//定旗协议
+message MoveReq{
+   repeated MovePosition positions = 1; //移动位置的集合
+}
+
+//移动的位置
+message MovePosition{
+   int32 x = 1;
+   int32 y = 2;
+}
+
+message MoveRes{
+   string uid = 1;
+   int32 color = 2 ;
+   TransArea area = 3;
+   repeated MovePosition positions = 4; //移动位置的集合
+   string next_uid =5;
+   int32 round = 6;
+   
+}
+
+//传输的区域
+message TransArea {
+   int32 value = 1;
+   int32 color = 2 ;
+   repeated MovePosition positions = 3;
+   
+}
+
+
