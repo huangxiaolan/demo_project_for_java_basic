@@ -8,85 +8,119 @@
 
         <link href="bootstrap.css" rel="stylesheet">
 
-	<style>
-		body {
-			padding:20px;
-		}
-		#console {
-			height: 400px;
-			overflow: auto;
-		}
-		.username-msg {color:orange;}
-		.connect-msg {color:green;}
-		.disconnect-msg {color:red;}
-		.send-msg {color:#888}
-	</style>
+    <style>
+        body {
+            padding:20px;
+        }
+        #console {
+            height: 400px;
+            overflow: auto;
+        }
+        .username-msg {color:orange;}
+        .connect-msg {color:green;}
+        .disconnect-msg {color:red;}
+        .send-msg {color:#888}
+    </style>
 
 
-	<script src="js/socket.io/socket.io.js"></script>
-        <script src="js/moment.min.js"></script>
-        <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script src="js/socket.io/socket.io.js"></script>
+    <script src="js/moment.min.js"></script>
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
 
-	<script>
-
-                var userName = 'user' + Math.floor((Math.random()*1000)+1);
-
-		var socket =  io.connect('http://localhost:9092/',{path:"/test"});
-
-		socket.on('connect', function() {
-			output('<span class="connect-msg">Client has connected to the server!</span>');
-		});
-
-		socket.on('chatevent', function(data) {
-			output('<span class="username-msg">' + data.userName + ':</span> ' + data.message);
-		});
-
-		socket.on('disconnect', function() {
-			output('<span class="disconnect-msg">The client has disconnected!</span>');
-		});
-
-                function sendDisconnect() {
-                        socket.disconnect();
-                }
-
-		function sendMessage() {
-                        var message = $('#msg').val();
-                        $('#msg').val('');
-
-                        var jsonObject = {userName: userName,
-                                          message: message};
-                        socket.emit('chatevent', jsonObject);
-		}
-
-		function output(message) {
-                        var currentTime = "<span class='time'>" +  moment().format('HH:mm:ss.SSS') + "</span>";
-                        var element = $("<div>" + currentTime + " " + message + "</div>");
-			$('#console').prepend(element);
-		}
-
-        $(document).keydown(function(e){
-            if(e.keyCode == 13) {
-                $('#send').click();
-            }
-        });
-	</script>
+    <script src="http://cdn.rawgit.com/dcodeIO/protobuf.js/6.8.4/dist/protobuf.min.js"></script>
+        
+        
 </head>
 
 <body>
 
-	<h1>Netty-socketio Demo Chat</h1>
+    <h1>Netty-socketio Demo Chat</h1>
 
-	<br/>
+    <br/>
 
-	<div id="console" class="well">
-	</div>
+    <div id="console" class="well">
+    </div>
 
-        <form class="well form-inline" onsubmit="return false;">
-           <input id="msg" class="input-xlarge" type="text" placeholder="Type something..."/>
-           <button type="button" onClick="sendMessage()" class="btn" id="send">Send</button>
-           <button type="button" onClick="sendDisconnect()" class="btn">Disconnect</button>
-        </form>
 
+     <script>
+     
+	     /**
+	      * 将获取的字节数据转化为json字符串
+	      * @param data js的bufferArray对象，要转化前的字节
+	      * @param probufBean probuf的对象，预先已经编译好
+	      * @returns 转化后的json对象
+	      */
+	     function getJsonString(data,probufBean){
+	         var buffer=new Uint8Array(data);
+	         var jsonObject=probufBean.decode(buffer).toJSON();
+	         return jsonObject;
+	     }
+	     /**
+	      * 将json对象转化的bufferArray字节流
+	      * @param data 要转化的json对象
+	      * @param probufBean protobuf对象
+	      * @returns bufferArray字节流
+	      */
+	     function getSendObject(data,probufBean){
+	         
+	         //var post=probufBean.create(data);
+	         //返回Uint8Array
+	         var sourcePost=probufBean.encode(data).finish();
+	         //提取Uint8Array中有值得数组生成bufferArray
+	         var postBuffer=sourcePost.buffer.slice(0,sourcePost.byteLength);
+	         return postBuffer;
+	     }
+	     //protobuf预处理
+	     protobuf.load("proto/base.proto",function(err, root) {
+	         if (err)
+	             throw err;
+	
+	         //获取proto中的对象模型
+	         var userProto = root.lookup("pb.User");
+	         //获取proto中的对象模型
+	         var responseProto = root.lookup("pb.Response");
+	
+	         //连接后台
+	         var socket = io.connect("http://127.0.0.1:9099", {
+	             //路径
+	             //path : socketPath,
+	             //连接参数
+	             //query : {
+	             //  post_data : JSON.stringify(postData)
+	             //}
+	         });
+	         
+	         //数组转化为字节
+	         var user=getSendObject({name:"hxl",phone:"13XXXXX1111"},userProto);
+	         //往socketio发送数据
+	         socket.emit("user_req",user);
+	
+	         //接收socketio的事件
+	         socket.on("user_res", function(data) {
+	        	 //解析返回结果为json对象
+	             var message=getJsonString(data,responseProto);
+	        	 
+	        	 var log="user_res:"
+                     + JSON.stringify(message);
+	             
+	             
+	             output(log);
+	         });
+	         
+	         
+	         function output(message) {
+	        	 console.log(message);
+                 var currentTime = "<span class='time'>" +  moment().format('HH:mm:ss.SSS') + "</span>";
+                 var element = $("<div>" + currentTime + " " + message + "</div>");
+			     $('#console').prepend(element);
+			 }
+	
+	         
+	
+	     });
+
+     
+     </script>
 
 
 </body>
