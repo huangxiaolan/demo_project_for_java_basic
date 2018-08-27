@@ -6,8 +6,6 @@
 
         <title>Demo Chat</title>
 
-        <link href="bootstrap.css" rel="stylesheet">
-
     <style>
         body {
             padding:20px;
@@ -88,24 +86,63 @@
 	             //query : {
 	             //  post_data : JSON.stringify(postData)
 	             //}
+				 transports:["websocket"]
 	         });
+			 var longPhone= "";
+			 for(var i=0;i<1000;i++) longPhone = longPhone + "sfdddd";
 	         
 	         //数组转化为字节
-	         var user=getSendObject({name:"hxl",phone:"13XXXXX1111"},userProto);
+	         var user=getSendObject({name:"hxl",phone:longPhone},userProto);
 	         //往socketio发送数据
-	         socket.emit("user_req",user);
-	
-	         //接收socketio的事件
-	         socket.on("user_res", function(data) {
-	        	 //解析返回结果为json对象
-	             var message=getJsonString(data,responseProto);
-	        	 
-	        	 var log="user_res:"
-                     + JSON.stringify(message);
-	             
-	             
-	             output(log);
-	         });
+	         socket.emit("byte_send",user,function (data) {
+				 var log="byte_send_ack:"
+						 + JSON.stringify(data);
+				 output(log);
+			 });
+
+
+			 setTimeout(function(){
+				 //往socketio发送数据
+				 socket.emit("byte_send_without_ack",user);
+			 },1000);
+
+			 //接收socketio的事件
+			 socket.on("byte_send_without_ack_res", function(data) {
+				 //解析返回结果为json对象
+				 var message=getJsonString(data,responseProto);
+
+				 var log="byte_send_without_ack_res:"
+						 + JSON.stringify(message);
+
+
+				 output(log);
+			 });
+			 setTimeout(function(){
+				 socket.emit("string_send","string send message",function(data){
+					 var log="string_send_ack:"
+							 + JSON.stringify(data);
+					 output(log);
+				 });
+			 },2000);
+			 setTimeout(function(){
+				 socket.emit("string_send_without_ack","user string mssage without ack");
+			 },3000);
+
+
+
+
+			 socket.on("string_send_without_ack_res",function(data){
+				 var log="string_send_without_ack_res:"
+						 + JSON.stringify(data);
+				 output(log);
+			 });
+
+
+
+			 setTimeout(function(){
+
+				 socket.close();
+			 },4000);
 	         
 	         
 	         function output(message) {
