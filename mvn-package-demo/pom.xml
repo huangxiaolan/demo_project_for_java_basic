@@ -1,0 +1,249 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.hxiaol</groupId>
+    <artifactId>mvn-package-demo</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <properties>
+        <main-class>com.hxiaol.demo.mvn.HelloMain</main-class>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.7.7</version>
+        </dependency>
+
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>zip</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+
+            <build>
+                <!-- 输出的包名 -->
+                <finalName>hello</finalName>
+
+                <resources>
+                    <!-- 控制资源文件的拷贝(默认复制到classes目录，最后打进jar包) -->
+                    <resource>
+                        <directory>src/main/resources</directory>
+                        <includes>
+                            <include>**/*.properties</include>
+                            <include>**/*.xml</include>
+                        </includes>
+                        <!-- 排除外置的配置文件(运行时注释上使IDE能读取到配置文件；打包时放开注释让配置文件外置方便修改) -->
+                        <excludes>
+                            <exclude>config.properties</exclude>
+                        </excludes>
+                    </resource>
+                    <!-- 配置文件外置的资源(存放到config目录，也是classpath路径，下面会配置) -->
+                    <resource>
+                        <directory>src/main/resources</directory>
+                        <includes>
+                            <include>config.properties</include>
+                        </includes>
+                        <targetPath>${project.build.directory}/config</targetPath>
+                    </resource>
+                </resources>
+
+                <plugins>
+                    <!-- 设置编译版本 -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>3.1</version>
+                        <configuration>
+                            <source>1.8</source>
+                            <target>1.8</target>
+                            <encoding>UTF-8</encoding>
+                        </configuration>
+                    </plugin>
+
+                    <!-- 打包jar文件时，配置manifest文件，加入lib包的jar依赖 -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <configuration>
+                            <archive>
+                                <!-- 清单文件，设置入口类和classpath -->
+                                <manifest>
+                                    <mainClass>${main-class}</mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                </manifest>
+                                <!-- 给清单文件添加键值对，增加classpath路径,这里将config目录也设置为classpath路径 -->
+                                <manifestEntries>
+                                    <Class-Path>config/</Class-Path>
+                                </manifestEntries>
+                            </archive>
+                            <classesDirectory>
+                            </classesDirectory>
+                        </configuration>
+                    </plugin>
+
+
+                    <!-- 拷贝依赖的jar包到lib目录 -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>copy-dependencies</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>
+                                        ${project.build.directory}/lib
+                                    </outputDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+
+                    <!-- 解决资源文件的编码问题 -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <version>2.5</version>
+                        <configuration>
+                            <encoding>UTF-8</encoding>
+                        </configuration>
+                    </plugin>
+
+
+                    <!-- 自定义打zip包 -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <version>2.2.1</version>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/main/assembly/assembly.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>make-assembly</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+
+                    <!-- 打包时取消单元测试 -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skipTests>true</skipTests>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+
+
+        </profile>
+
+        <profile>
+            <id>jar</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+
+            <build>
+                <!-- 输出的包名 -->
+                <finalName>hello</finalName>
+
+                <resources>
+                    <!-- 控制资源文件的拷贝(默认复制到classes目录，最后打进jar包) -->
+                    <resource>
+                        <directory>src/main/resources</directory>
+                        <includes>
+                            <include>**/*.properties</include>
+                            <include>**/*.xml</include>
+                        </includes>
+                        <!-- 排除外置的配置文件(运行时注释上使IDE能读取到配置文件；打包时放开注释让配置文件外置方便修改) -->
+                        <excludes>
+                            <exclude>config.properties</exclude>
+                        </excludes>
+                    </resource>
+                    <!-- 配置文件外置的资源(存放到config目录，也是classpath路径，下面会配置) -->
+                    <resource>
+                        <directory>src/main/resources</directory>
+                        <includes>
+                            <include>config.properties</include>
+                        </includes>
+                        <targetPath>${project.build.directory}/config</targetPath>
+                    </resource>
+                </resources>
+
+                <plugins>
+                    <!-- 设置编译版本 -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>3.1</version>
+                        <configuration>
+                            <source>1.8</source>
+                            <target>1.8</target>
+                            <encoding>UTF-8</encoding>
+                        </configuration>
+                    </plugin>
+
+
+                    <!-- 将所有依赖的jar包的内容复制到同一个jar中 -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <version>2.2.1</version>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>${main-class}</mainClass>
+                                </manifest>
+                            </archive>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                        </configuration>
+
+                        <executions>
+                            <execution>
+                                <id>make-assembly</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+
+                    <!-- 打包时取消单元测试 -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skipTests>true</skipTests>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+
+
+        </profile>
+
+    </profiles>
+
+</project>
