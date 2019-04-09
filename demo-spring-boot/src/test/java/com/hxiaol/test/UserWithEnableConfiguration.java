@@ -1,13 +1,10 @@
 package com.hxiaol.test;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.stereotype.Component;
-
 import com.hxiaol.demo.bean.User;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 
-@Component
-@EnableConfigurationProperties
+@Configuration
 public class UserWithEnableConfiguration {
     
    

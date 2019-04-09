@@ -33,11 +33,20 @@ my:
 
 细节可以参考测试类TestEnableConfigurationAnnotation
 
+## @EnableConfigurationProperties
+
+注入ConfigurationProperties 注解的类
+
 ## spring默认logback的配置。
 
 启动spring使用 --debug --trace 可以得到spring启动非常详细的日志。
 
-logback配置有空再来补充吧。
+
+logging:
+  config: classpath:logback-spring-test_yn.xml
+  # 默认加载logback-spring.xml 文件
+
+配置属性不允许出现大写，大写用-进行分割
 
 # spring boot 自定义starter
 
@@ -67,3 +76,29 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.example.autoc
 </dependency>
 ```
 即可使用spring web相关的注解，如@RestController，@RequestMapping
+
+
+## spring boot 多环境配置与启动命令
+
+默认加载顺序位置:
+–file:./config/
+
+–file:./
+
+–classpath:/config/
+
+–classpath:/
+
+指定配置的位置  --spring.config.location=G:/application.properties
+
+启动时指定加载配置名称 --spring.profiles.active=dev
+
+首先加载  application-{profile}.yml 文件， 没有再去加载application.yml 数据
+
+打包命令：
+
+mvn package spring-boot:repackage
+
+启动服务命令,根据不同环境配置不同的变量。
+
+java -jar target/demo-spring-boot-0.0.1-SNAPSHOT.jar --spring.profiles.active=dev

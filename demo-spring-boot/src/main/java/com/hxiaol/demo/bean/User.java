@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 @Component //测试这里的bean生成与@Bean注解生成的区别
 public class User {
 
+    
     String name;
     String phone;
     public String getName() {

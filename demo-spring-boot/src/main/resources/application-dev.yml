@@ -11,7 +11,7 @@ user1 :
   name :  hello
   phone : 1113333444
 test-data:
-  test :  ide
+  test : dev
 
 server:
   tomcat:
