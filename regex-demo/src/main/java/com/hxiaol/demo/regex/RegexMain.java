@@ -1,4 +1,4 @@
-package com.hxiaol.demo.regex;
+package com.hxiaol.demo.mvn;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

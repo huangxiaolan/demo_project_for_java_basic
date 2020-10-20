@@ -23,6 +23,7 @@ public class App
         
         //构造服务器
         final SocketIOServer server = new SocketIOServer(config);
+
         //添加监听事件
         server.addEventListener("byte_send", byte[].class, new DataListener<byte []>() {
             

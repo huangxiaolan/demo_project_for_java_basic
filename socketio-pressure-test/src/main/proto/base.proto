@@ -1,0 +1,119 @@
+syntax = "proto3";
+
+package pb;
+
+option cc_generic_services = true;
+option java_generic_services = true;
+option py_generic_services = true;
+
+option java_package = "com.yy.wolfkill.h5game.hechengfangzhi.pb";
+option java_multiple_files = true;
+
+message LoginRes {
+    int32 code = 1;
+    string msg = 2;
+    PostData post_data = 3;
+    string config = 4;
+}
+
+message PostData {
+    string channel = 1;
+    string gameid = 2;
+    string roomid = 3;
+    Player player = 4;
+}
+
+message Player {
+    string uid = 1;
+    string name = 2;
+    string avatarurl = 3;
+    string opt = 4;
+}
+
+message UserLoginRes {
+    int32 code = 1;
+    string msg = 2;
+    repeated Player data = 3;
+}
+
+message LoadProgressReq {
+    int32 progress = 1;
+}
+
+message LoadProgressRes {
+    int32 code = 1;
+    string msg = 2;
+    repeated Progress data = 3;
+}
+
+message Progress {
+    string uid = 1;
+    int32 progress = 2;
+}
+
+message ReadyReq {
+    bool ready = 1;
+}
+
+message ReadyRes {
+    int32 code = 1;
+    string msg = 2;
+    ReadyResData data = 3;
+}
+
+message ReadyResData {
+    repeated string uids = 1;
+}
+
+message UnvarnishedReq {
+    bytes data = 1;
+    string sn = 100;
+}
+message UnvarnishedRes {
+    int32 code = 1;
+    string msg = 2;
+    bytes data = 3;
+    string sn = 100;
+}
+
+
+message HeartReq {
+
+}
+message HeartRes {
+    int64 timestamp = 1;
+}
+
+
+message GiveUpReq {
+
+}
+message GiveUpRes {
+    int32 code = 1;
+    string msg = 2;
+    GiveUpResData data = 3;
+}
+message GiveUpResData {
+    string uid = 1;
+}
+message ForceExitReq {
+
+}
+message ForceExitRes {
+    int32 code = 1;
+    string msg = 2;
+    ForceExitResData data = 3;
+}
+message ForceExitResData {
+    string uid = 1;
+}
+
+// 心跳消息
+message HeartbeatReq {
+    int64 cTime = 1;
+}
+
+message HeartbeatRes {
+    int64 cTime = 2;
+    int64 sTime = 1; // 服务器当前时间
+}

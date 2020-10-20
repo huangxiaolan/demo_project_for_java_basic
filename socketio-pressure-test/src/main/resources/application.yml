@@ -1,0 +1,19 @@
+server:
+  tomcat:
+    uri-encoding: UTF-8
+    max-http-header-size: 8096
+    max-threads: 300
+  port: 9099
+
+data :
+  connect :
+      gameid : shenqidongwudamaoxian_yn_dl
+      opt : aaa
+      #url : http://183.3.211.167:10999/
+      url : http://127.0.0.1:8015/
+  pressure :
+      room-num : 1000  # 启动房间数量
+
+      room-num-start-persecond : 500 #每秒启动数量
+
+      pressure-second : 800  # 压测持续时间

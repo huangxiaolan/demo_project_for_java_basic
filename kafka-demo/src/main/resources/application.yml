@@ -2,18 +2,26 @@
 spring:
     kafka:
         bootstrap-servers: ${server_list}
+
+        properties:
+
+            enable.idempotence: true
+
     producer:
         key-serializer: org.apache.kafka.common.serialization.StringSerializer
         value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+
     consumer:
         group-id: test
         enable-auto-commit: true
         auto-commit-interval: 1000
         key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
         value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
 server:
-  tomcat:
-      uri-encoding: UTF-8
-      max-http-header-size: 8096
-      max-threads: 300
-  port: 9099
+   tomcat:
+       uri-encoding: UTF-8
+       max-http-header-size: 8096
+       max-threads: 300
+   port: 9099

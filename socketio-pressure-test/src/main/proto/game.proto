@@ -1,0 +1,460 @@
+syntax = "proto3";
+
+package pb;
+
+option cc_generic_services = true;
+option java_generic_services = true;
+option py_generic_services = true;
+
+option java_package = "com.yy.wolfkill.h5game.hechengfangzhi.pb";
+option java_multiple_files = true;
+
+// readyGoRes协议
+message ReadyGoRes {
+    int32 code = 1;
+    string msg = 2;
+    ReadyGoResData data = 3;
+    string sn = 100;
+}
+message ReadyGoResData {
+    int64 offlineAward = 1; //离线的奖励，为0时不需要弹出领奖励的接口
+    int64 offlineSecond = 12; //离线时间，单位秒
+    repeated AnimalData animals = 2; //用户拥有的动物列表
+    UserData user = 3; //用户的基础奖励
+    repeated AnimalPositionData animalPositions = 4; //动物列表
+    repeated SignData signs = 5; //签到数据
+    GiftData gift = 6; //天赋数据
+    repeated DesData deses = 7; //动物图鉴数据
+
+    int64 advantureTime = 8; //可以冒险的时间
+
+    int64 turnplateSize = 10; // 转盘的次数
+
+    int64 accecelateFinishTime = 11; //加速的结束时间，0表示未进入加速时间
+}
+
+//游戏协议
+
+//道具数据
+message ItemData{
+    int32 id = 1; //道具id
+    int64 num = 2; //道具数量
+}
+// 用户的基础数据
+message UserData{
+    int64 coin = 1; //用户拥有的金币
+    int64 diamond = 2; //用户拥有的钻石
+    int64 rate = 3; // 金币生产效率 , 除以1000才是准确的值
+    int64 time = 4; //具体的时间戳，精确到秒
+    int64 accelerateEndTime = 5 ; //加速结束时间
+    int32 level = 6; //玩家等级
+}
+
+// 动物合成与展示相关协议
+
+//获取用户在座位上的动物列表
+message AnimalGetAllReq{
+
+}
+//动物数据
+message AnimalData{
+    int32 id = 1; //动物id
+    int64 coin = 3; //动物金币价格
+    int64 diamond = 4; //动物钻石价格
+    int64 soldCoin = 5; //动物出售金币价格
+    int64 goldProduce = 6; //单位时间间隔产出金钱
+    int64 intervalTime = 7; //单位时间间隔
+    int64 goldEffectiveness = 8; //单位产钱效率
+
+}
+message AnimalPositionData{
+    AnimalData animal = 1;
+    int32 pid = 2;
+}
+message AnimalGetAllRes{
+    repeated AnimalPositionData animals = 1; //动物列表
+    int32 code = 101;
+    string msg = 102;
+}
+
+// 动物合成
+message AnimalComposeReq{
+    int32 id1 = 1; // 要合成的第一个动物id
+    int32 pid1 = 2; // 第一个动物位置
+
+    int32 id2 = 3; // 要合成的第二个动物id
+    int32 pid2 = 4; //第二个位置
+}
+
+
+message AnimalComposeRes{
+    AnimalPositionData animal = 1; //合成的新动物
+    AnimalPositionData giftAnimal = 6; //天赋奖励的动物，大部分时间为空
+
+    bool new = 2; //是否是第一发现该动物
+    repeated ItemData awardItems = 5; //合成奖励，该奖励里面不含经验了
+    int64 exp = 9; //奖励的经验
+
+
+    UserData user = 8; //新的用户属性
+
+    int32 code = 101; // 90001 表示动物到达最高等级无法合成了
+    string msg = 102;
+}
+
+// 动物交换位置 ， 允许移动到空的位置，
+message AnimalExchangeReq{
+    int32 id1 = 1; // 要合成的第一个动物id ， 0表示该位置上没有动物
+    int32 pid1 = 2; // 第一个动物位置
+
+    int32 id2 = 3; // 要合成的第二个动物id
+    int32 pid2 = 4; //第二个位置
+    //TODO remove
+    int64 cTime = 6;
+}
+
+message AnimalExchangeRes{
+    int32 id1 = 1; // 新的动物id
+    int32 pid1 = 2; // 第一个动物位置
+
+    int32 id2 = 3; // 新的动物id
+    int32 pid2 = 4; //第二个位置
+    //TODO remove
+    int64 cTime = 6;
+    int32 code = 101;
+    string msg = 102;
+}
+
+// 动物出售
+message AnimalSellReq{
+    int32 id1 = 1; // 要出售的动物id
+    int32 pid1 = 2; // 动物位置
+
+}
+
+message AnimalSellRes{
+    int32 id1 = 1; // 要出售的动物id
+    int32 pid1 = 2; // 动物位置
+    int64 coin = 3; //出售获取的金币
+
+    UserData user = 4; //新的用户属性
+
+    int32 code = 101;
+    string msg = 102;
+
+}
+
+//商店相关
+//获取用户所有可购买的动物列表
+message ShopGetAllAnimalReq{
+
+}
+
+message ShopGetAllAnimalRes{
+    repeated AnimalData animals = 1;
+    int32 code = 101;
+    string msg = 102;
+}
+//购买动物请求
+message ShopBuyAnimalReq{
+    int32 id = 1; //要购买的动物id
+    int32 type = 2; // 1表示金币购买 ， 2表示钻石购买
+}
+
+message ShopBuyAnimalRes{
+    int32 id = 1; //要购买的动物id
+    int32 type = 2;
+
+    AnimalPositionData animal = 3; //购买的动物新属性
+    UserData user = 4; //新的用户属性
+
+    int32 code = 101; //  0表示购买成功 ， 10表示位置不够， 30001表示金币不足 30002表示钻石不足
+    string msg = 102;
+}
+
+//快速购买动物
+message ShopQuickBuyAnimalReq{
+
+}
+
+message ShopQuickBuyAnimalRes{
+
+    AnimalPositionData animal = 3; //购买的动物新属性
+    UserData user = 4; //新的用户属性
+
+    int32 code = 101; //  0表示购买成功 ， 10表示位置不够， 30004表示不存在可购买的动物
+    string msg = 102;
+}
+
+// 获取所有的任务
+// 前端每隔一分钟刷新任务状态
+
+message TaskGetAllReq{
+
+}
+message TaskGetAllRes{
+    repeated TaskData tasks = 1;
+    int32 code = 101;
+    string msg = 102;
+}
+//任务数据
+message TaskData{
+    int32 id = 1; //任务序号
+    int32 status = 2; //任务状态，包括1，任务进行中 ， 2 任务等待领取奖励  3 已完成  4,7 任务等待刷新  5 表示未解锁 6 任务进行中但是不能够刷新了
+    int64 endTime = 3; // 任务刷新的截止时间，2状态时该字段为0表示没有， 时间戳，精确到秒
+    int32 tid = 4; // 属于那个类别的任务，相同类别的任务具有相同的任务，相同奖励
+}
+
+//未完成的任务可以刷新任务请求
+message TaskRefreshReq{
+    int32 id = 1; //
+}
+
+message TaskRefreshRes{
+    TaskData tasks = 1;
+    int32 code = 101; // 50001表示状态不对无法刷新
+    string msg = 102;
+}
+//领取奖励请求
+message TaskGetAwardReq{
+    int32 id = 1; //
+}
+
+//
+message TaskGetAwardRes{
+    int32 id = 1; //
+    repeated ItemData items = 2; // 奖励的道具数据
+
+    int32 code = 101;
+    string msg = 102;
+}
+
+
+
+//每日签到协议
+//获取所有每日签到数据
+//没隔一分钟刷新一次. 获取时顺便进行签到
+message SignGetAllReq{
+
+}
+
+message SignGetAllRes{
+    repeated SignData signs = 1; //签到数据
+    int32 code = 101;
+    string msg = 102;
+}
+
+message SignData{
+    int32 day = 1; //第几天的签到数据 1到7
+    repeated ItemData items = 2; //签到奖励
+    int32 status = 3; // 签到数据的状态，0表示未签到，1表示已签到未领取奖励，2表示已经领取奖励
+    int64 time = 4; //签到的时间
+
+}
+//发起签到， 用户到了第二天，自动帮他签到用，登录时不需要调用该接口
+message SignInReq{
+    int32 day = 1; //第几天的签到数据
+}
+
+message SignInRes{
+    int32 day = 1; //第几天的签到数据 1到7
+    int32 code = 101; // 10003 表示重复签到 10004 时间未到无法签到
+    string msg = 102;
+}
+//领取签到奖励
+message SignGetAwardReq{
+    int32 day = 1; //第几天的签到数据
+}
+
+message SignGetAwardRes{
+    int32 day = 1; //第几天的签到数据
+    repeated ItemData items = 2; //签到奖励
+    int32 code = 101; //10001 还未签到无法领取奖励   10002  无法重复领取奖励
+    string msg = 102;
+}
+
+//用户天赋相关
+//获取用户天赋列表
+message GiftGetReq{
+
+}
+//用户的天赋数据
+message GiftData{
+    int32 g1 = 1; // 天赋1的等级
+    int32 g2 = 2; // 天赋2的等级
+    int32 g3 = 3;
+    int32 g4 = 4;
+    int32 g5 = 5;
+    int32 g6 = 6;
+    int32 g7 = 7;
+    int32 g8 = 8;
+    int32 g9 = 9; // 天赋9的等级
+}
+
+message GiftGetRes{
+    GiftData gift = 1; // 用户的天赋数据
+
+    int32 code = 101;
+    string msg = 102;
+}
+
+//天赋升级
+message GiftUpgradeReq{
+    int32 gift = 1; //升级那个天赋，从1到9
+    int32 level = 2; //当前天赋的等级
+}
+
+message GiftUpgradeRes{
+    int32 gift = 1; //升级那个天赋，从1到9
+    int32 level = 2; //当前天赋的等级
+
+    int64 consumeCoin = 3; //消费的金币
+    int32 coinType = 4; //货币的类型
+
+    int32 code = 101; // 0表示升级成功，70001;  钻石不足，无法升级 70002;  金币不足，无法升级， 70003表示不能重复升级， -1表示未知异常
+    string msg = 102;
+}
+
+
+//用户图鉴相关
+// TODO 讨论：多语言数据配置在前端，后端不用管多语言的问题
+//获取动物图鉴的基础信息
+message DesGetAllReq{
+
+}
+//动物描述信息
+message DesData{
+    int32 id = 1; //动物的id
+    int64 discoverTime = 2; //.发现的时间戳，精确到秒
+    int64 cost = 3; //购买的价格
+}
+//图鉴响应列表
+message DesGetAllRes{
+    repeated DesData datas = 1; //已经解锁的动物列表
+    int32 code = 101;
+    string msg = 102;
+}
+
+//其他协议
+//开始冒险
+message AdventureReq{
+
+}
+
+message AdventureRes{
+    repeated ItemData items = 1; //冒险的奖励
+    int64 nextTime = 2; //下一次可以冒险的时间戳，精确到秒
+
+    int32 code = 101; //0表示成功冒险， 40001表示cd时间未到
+    string msg = 102;
+}
+
+//开始请求转盘奖励
+message TurnplateReq{
+
+}
+message TurnplateRes{
+    ItemData item = 1; //转盘的奖励
+    int64 time = 2; //当前的时间戳，精确到秒 ，加上配置可以算出转盘的真正次数
+    int32 left = 3; //剩下的转盘次数
+    int32 index = 4;
+
+    int32 code = 101; //0表示成功， 20001表示转盘次数不足
+    string msg = 102;
+}
+
+//获取转盘次数
+message TurnplateGetTimeReq{
+
+}
+
+message TurnplateGetTimeRes{
+    int64 turTime = 2; //当前的时间戳，精确到秒 ，加上配置可以算出转盘的真正次数
+    int32 left = 3; //剩下的转盘次数
+    repeated ItemData items = 1; //转盘的奖励列表
+
+    int32 code = 101;
+    string msg = 102;
+}
+//开始加速
+message AccelerateReq{
+    int32 type = 1; //1表示钻石加速 ，2表示金币加速
+}
+
+message AccelerateRes{
+    int32 type = 1; //1表示钻石加速 ，2表示金币加速
+
+    int64 finishTime = 2; //加速结束时间
+    int64 curTime = 3; //当前时间
+    UserData user = 4; //基础数据变更
+    repeated AnimalPositionData animals = 5; //动物的产出效率调整
+
+    int32 code = 101; //0表示成功 ，60001; 钻石不足，无法加速  60002 ;已经处于加速了，无法加速
+    string msg = 102;
+}
+
+//领取哪一级的等级奖励 ,发放未领取过的更低等级的奖励
+message LevelAwardAchieveReq{
+    int32 level = 1;
+}
+
+message LevelAwardAchieveRes{
+    int32 level = 1;
+
+    repeated ItemData items = 2;
+
+    int32 code = 101; //0表示成功
+    string msg = 102;
+}
+
+message OfflineAwardReq{
+    int64 num = 1;
+}
+
+message OfflineAwardRes{
+    int64 num = 1;
+    int32 code = 101; //0表示成功
+    string msg = 102;
+}
+
+// 断线重连协议
+message ReLoginRes {
+    int32 code = 1;
+    string msg = 2;
+    ReLoginResData data = 3;
+}
+
+message ReLoginResData {
+    string config = 1; //通用的关卡配置
+}
+
+
+message GameOverRes {
+    int32 code = 1;
+    string msg = 2;
+    GameOverResData data = 3;
+}
+message GameOverResData {
+    string reason = 1;
+    string winUid = 2;
+    ResultWrapper result = 3;
+
+}
+
+message ResultWrapper {
+    int32 timestamp = 1;
+    string nonstr = 2;
+    string sign = 3;
+    Result result = 4;
+}
+
+message Result {
+    string gameid = 1;
+    string roomid = 2;
+    string channelid = 3;
+    string resulttype = 4;
+    repeated string users = 5;
+    repeated string winners = 6;
+
+}
+

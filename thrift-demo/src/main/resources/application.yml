@@ -1,0 +1,21 @@
+logging:
+  config: classpath:logback-spring-test_yn.xml
+  # 默认加载logback-spring.xml 文件
+my:
+  servers:
+    - dev.bar.com
+    - foo.bar.com
+    - jiaobuchong.com
+
+user1 :
+  name :  hello
+  phone : 1113333444
+test-data:
+  test :  ide
+
+server:
+  tomcat:
+    uri-encoding: UTF-8
+    max-http-header-size: 8096
+    max-threads: 300
+  port: 9099
